@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">FoodRescue</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="app_name">FoodRescue</string>    
+    <string name = "title_add"> Add</string>
+    <string name = "title_expired"> Expired</string>
+    <string name = "title_non_expired">Non-Expired</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name = "food_name_hint">Food Item Name</string>
+    <string name = "exp_label">Expiration Date</string>
+    <string name = "button_take_photo">Take Photo</string>
+    <string name = "button_barcode">Scan Code</string>
+    <string name = "button_save"> Save Item</string>
+    
+    <string-array
+        name="edit_options_array">
+        <item>Delete</item>
+        <item>Edit</item>
+    </string-array>
+    
 
 </resources>

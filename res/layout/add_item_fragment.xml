@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <EditText
+        android:id="@+id/etNameField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:inputType="text"
+        android:hint="@string/food_name_hint"
+         />
+
+    <DatePicker
+        android:id="@+id/dpExpirateDate"
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:layout_below="@+id/etNameField"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp"
+        android:calendarViewShown="false" />
+
+    <TextView
+        android:id="@+id/tvDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dpExpirateDate"
+        android:layout_centerHorizontal="true"
+        android:text="@string/exp_label"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <Button
+        android:id="@+id/bSave"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/button_save" />
+
+    <Button
+        android:id="@+id/bTakePhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bScanCode"
+        android:layout_alignRight="@+id/dpExpirateDate"
+        android:layout_marginBottom="18dp"
+        android:text="@string/button_take_photo" />
+
+    <Button
+        android:id="@+id/bScanCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bSave"
+        android:layout_alignLeft="@+id/bTakePhoto"
+        android:layout_marginBottom="28dp"
+        android:text="@string/button_barcode" />
+
+    <ImageView
+        android:id="@+id/ivFoodImage"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_alignBottom="@+id/bScanCode"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="20dp"
+        android:src="@drawable/food_deafault" />
+
+</RelativeLayout>
