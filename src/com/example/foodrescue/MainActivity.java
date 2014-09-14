@@ -1,5 +1,8 @@
 package com.example.foodrescue;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import android.support.v7.app.ActionBarActivity;
@@ -8,8 +11,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,8 +49,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         hideSystemUI();
+        
+        createNotification();
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -93,6 +104,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+        	Intent intent = new Intent(this,SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -168,7 +181,22 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
     }
 
+    private void createNotification() {
+    	Calendar cal = Calendar.getInstance();
+    	cal.setTimeInMillis(System.currentTimeMillis());
+    	cal.set(Calendar.HOUR, 8);
+    	Log.d("month", cal.MONTH + "");
+    	Log.d("day", cal.DAY_OF_MONTH + "");
+    	Log.d("year", cal.YEAR + "");
+    	
+    	Intent intent = new Intent(this, AlarmReceiver.class);
+    	PendingIntent pintent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+    	AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+    	alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 24*60*60*1000, pintent);  
 
+    	
+    	
+    }
 
    
 

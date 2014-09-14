@@ -13,6 +13,14 @@
     <string name = "button_barcode">Scan Code</string>
     <string name = "button_save"> Save Item</string>
     
+    <string name = "pref_expire_alarm">Number of Days to be Notified Before</string>
+    <string name = "pref_expire_key">Expire_Day</string>
+     <string name = "pref_expire_default">2</string>
+    
+    <string name = "pref_expire_recipes">Number of Days for Recipes</string>
+    <string name = "pref_recipe_key">Expire_Recipe</string>
+    <string name = "pref_recipe_default">7</string>
+    
     <string-array
         name="edit_options_array">
         <item>Delete</item>

@@ -5,13 +5,14 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="16"
         android:targetSdkVersion="19" />
     
     <uses-feature android:name="android.hardware.camera"
                   android:required="true" />
+    <uses-permission android:name="android.permission.INTERNET" /> 
+   
     
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -19,16 +20,54 @@
         android:theme="@style/AppTheme"
              
          >
+        <receiver android:name=".AlarmReceiver" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustPan" >
+            android:windowSoftInputMode="adjustPan"
+             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name=".SettingsActivity"
+            android:label="Settings"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.foodrescue.MainActivity" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SETTINGS" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name=".ListRecipes"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustPan"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.foodrescue.MainActivity" />
+            
+            
+            <intent-filter>
+                <action android:name="android.intent.action.LISTRECIPES" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
     </application>
 
 </manifest>

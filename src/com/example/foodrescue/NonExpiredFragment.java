@@ -15,8 +15,12 @@ import databases.FoodItemsContract.NonExpiredEntry;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.internal.widget.ListPopupWindow;
 import android.util.Log;
@@ -32,33 +36,35 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class NonExpiredFragment extends Fragment {
+public class NonExpiredFragment extends Fragment implements android.view.View.OnClickListener {
 	
 public  NonExpiredFragment() {}
 
-	ArrayAdapter<FoodItem> forecastAdapter;
-	ArrayList<FoodItem> foodItems;
-	ListView list;
-	ArrayAdapter<FoodItem> adapter;
-	
+	private ArrayAdapter<FoodItem> forecastAdapter;
+	private ArrayList<FoodItem> foodItems;
+	private ListView list;
+	private ArrayAdapter<FoodItem> adapter;
+	private Button getRecipeButton;
+	private SharedPreferences sharedPreferences;
+	private SQLiteHelper sql;
 	private static final String LOG_TAG = NonExpiredFragment.class.getCanonicalName();
-	SQLiteHelper sql;
+	
 	private static final String[] editNames={"Delete", "Edit"};
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
-		sql = new SQLiteHelper(getActivity());			
+		sql = new SQLiteHelper(getActivity());		
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 			ViewGroup container, Bundle savedInstanceState) {		
 		View rootView = inflater.inflate(R.layout.valid_items_fragment,container, false);
-		foodItems = sql.getAllNonExpiredFood();
-		for(FoodItem f: foodItems){
-			Log.d("FOOD ITEM", f.getId()+"");
-		}
+		getRecipeButton = (Button)rootView.findViewById(R.id.bGetRecipes);
+		getRecipeButton.setOnClickListener(this);
+		foodItems = sql.getAllNonExpiredFood();		
 		populateListView(rootView);		
 		return rootView;
 	}
@@ -137,41 +143,25 @@ public  NonExpiredFragment() {}
 				return itemView;			
 			}		
 		}
-		
-		private String parseDate(String dateString){
-			try {
-				Date temp = new SimpleDateFormat("yyyy-MM-dd")
-				.parse(dateString);
-				
-				String month = getMonth(temp.getMonth());
-				
-				return temp.getDay() + " " + month + ", " + temp.getYear(); 
-				
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				return null;				
-			}  
+	@Override
+	public void onClick(View v) {
+		switch(v.getId()){
+		case R.id.bGetRecipes:
+			Log.d("RECIPES_DEBUG", "in recipes button");			
+			String numStr = sharedPreferences.getString(getString(R.string.pref_recipe_key),getString(R.string.pref_recipe_default));
+			int maxDays = Integer.parseInt(numStr);
+			Log.d("SETTINGS","Days preference is " + maxDays);
+			
+			Intent intent = new Intent(getActivity(),ListRecipes.class);
+			startActivity(intent);
+			ArrayList<String> result = sql.getNonExpiredNames(maxDays);			
+			break;
 		}
 		
-		private String getMonth(int month){
-			String monthString;
-	        switch (month) {
-	            case 1:  monthString = "January";       break;
-	            case 2:  monthString = "February";      break;
-	            case 3:  monthString = "March";         break;
-	            case 4:  monthString = "April";         break;
-	            case 5:  monthString = "May";           break;
-	            case 6:  monthString = "June";          break;
-	            case 7:  monthString = "July";          break;
-	            case 8:  monthString = "August";        break;
-	            case 9:  monthString = "September";     break;
-	            case 10: monthString = "October";       break;
-	            case 11: monthString = "November";      break;
-	            case 12: monthString = "December";      break;
-	            default: monthString = "Invalid month"; break;
-	        }
-	        return monthString;
-		}
+	}
+	
+		
+		
 		
 
 }

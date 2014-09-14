@@ -1,11 +1,17 @@
 package databases;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.*;
+import android.text.format.DateFormat;
 import android.util.Log;
 import databases.FoodItemsContract.AllFoods;
 import databases.FoodItemsContract.ExpiredEntry;
@@ -118,10 +124,74 @@ public class SQLiteHelper extends SQLiteOpenHelper
 		return entries;
 	}
 	
-	public void getAllExpiredFood(){
+	public ArrayList<FoodItem> getAllExpiredFood(){
+		SQLiteDatabase db = this.getWritableDatabase();
+		ArrayList<FoodItem> entries =  new ArrayList<FoodItem>();
 		
+		 String[] columns = {
+	                ExpiredEntry._ID,
+	                ExpiredEntry.ITEM_NAME,
+	                ExpiredEntry.EXPIRATION_DATE
+	        };
+
+		 Cursor cursor = db.query(
+	                ExpiredEntry.TABLE_NAME,  // Table to Query
+	                columns,
+	                null, // Columns for the "where" clause
+	                null, // Values for the "where" clause
+	                null, // columns to group by
+	                null, // columns to filter by row groups
+	                null // sort order
+	        );
+		while(cursor.moveToNext()){
+			int index = cursor.getColumnIndex(ExpiredEntry.ITEM_NAME);
+            String name = cursor.getString(index);
+            
+            index = cursor.getColumnIndex(ExpiredEntry.EXPIRATION_DATE);
+            String date = cursor.getString(index); 
+            
+            index = cursor.getColumnIndex(ExpiredEntry._ID);
+            int id = cursor.getInt(index); 
+            
+            entries.add(new FoodItem(name, date, null,id));      
+		}		
+		db.close();
+		return entries;
 	}
 	
+	public int moveExpiredFood(){
+		SQLiteDatabase db = this.getWritableDatabase();	
+		Calendar c = Calendar.getInstance();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		String formattedDate = df.format(c.getTime());
+		String query = "SELECT * " + "FROM " + NonExpiredEntry.TABLE_NAME;
+		int count = 0;
+		Cursor cursor = db.rawQuery(query,null);	
+		 Log.d("SQ_LITE_DEBUG","date is " + formattedDate);
+		
+		while(cursor.moveToNext()){
+			int index = cursor.getColumnIndex(NonExpiredEntry.ITEM_NAME);
+            String name = cursor.getString(index);            
+            index = cursor.getColumnIndex(NonExpiredEntry.EXPIRATION_DATE);
+            String date = cursor.getString(index); 
+            
+            index = cursor.getColumnIndex(NonExpiredEntry._ID);
+            int id = cursor.getInt(index);
+            
+            if(date.compareTo(formattedDate) <= 0){
+            	//delete for non expired
+            	db.delete(NonExpiredEntry.TABLE_NAME, NonExpiredEntry._ID + "=" + id, null);            
+            	ContentValues values = new ContentValues();	          
+    			values.put(ExpiredEntry.ITEM_NAME,name);
+    			values.put(ExpiredEntry.EXPIRATION_DATE, date);		
+    			db.insert(ExpiredEntry.TABLE_NAME, null, values);
+    			count++;
+            }
+		}		
+		
+		db.close();
+		return count;
+	}	
 	
 	public void removeNonExpiredFood (int id)
 	{
@@ -129,4 +199,46 @@ public class SQLiteHelper extends SQLiteOpenHelper
 		db.delete(NonExpiredEntry.TABLE_NAME, NonExpiredEntry._ID + "=" + id, null);
 		db.close();
 	}	
+	
+	public void removeExpiredFood (int id)
+	{
+		SQLiteDatabase db = this.getWritableDatabase();			
+		db.delete(ExpiredEntry.TABLE_NAME, ExpiredEntry._ID + "=" + id, null);
+		db.close();
+	}
+	
+	public ArrayList<String> getNonExpiredNames(int maxDays){
+		SQLiteDatabase db = this.getWritableDatabase();					
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd",Locale.US);
+		ArrayList<String> validItems = new ArrayList<String>();		
+		
+		Date currDate = new Date();
+		long curr_date = currDate.getTime();
+		String query = "SELECT * " + "FROM " + NonExpiredEntry.TABLE_NAME;
+		Cursor cursor = db.rawQuery(query,null);
+		
+		while(cursor.moveToNext()){
+			int index = cursor.getColumnIndex(NonExpiredEntry.ITEM_NAME);
+            String name = cursor.getString(index);            
+            index = cursor.getColumnIndex(NonExpiredEntry.EXPIRATION_DATE);
+            String date = cursor.getString(index);           
+            try {
+				Date result =  df.parse(date);
+				long exp_date = result.getTime();
+				long diff = exp_date-curr_date;
+				int num_days = (int) (diff/(1000*60*60*24));
+				Log.d("DIFFERENCE IN DATES","Item is " + name + " difference is " + num_days);
+				if(num_days <= maxDays){
+					validItems.add(name);
+				}
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}          
+		}	
+		db.close();
+		return validItems;		
+	}
+	
+	
 }
